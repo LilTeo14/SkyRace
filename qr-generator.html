@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyRace · Generador de Códigos QR Circulares (15 cm)</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0b0b0d;
+      --card-bg: #141419;
+      --accent: #ff9700;
+      --border: #26262e;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #f0f0f5;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    .header-actions h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header-actions h1 span {
+      background: rgba(255, 151, 0, 0.15);
+      color: var(--accent);
+      padding: 0.25rem 0.75rem;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 151, 0, 0.3);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: #ffab2e;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #202028;
+      color: #fff;
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #2a2a35;
+    }
+
+    .info-banner {
+      background: rgba(255, 151, 0, 0.08);
+      border: 1px solid rgba(255, 151, 0, 0.25);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .info-banner svg {
+      flex-shrink: 0;
+      margin-top: 0.2rem;
+      stroke: var(--accent);
+    }
+
+    .grid-qrs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .qr-card-edit {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    /* Standardized 15cm Circular Badge Preview */
+    .badge-wrapper {
+      width: 260px;
+      height: 260px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 14px 14px 14px;
+      box-sizing: border-box;
+      border: 2px dashed #bbb;
+      outline: 4px solid var(--accent);
+      outline-offset: -12px;
+    }
+
+    .badge-header {
+      text-align: center;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .badge-sub {
+      font-size: 7.5px;
+      color: #666;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-num-pill {
+      background: #0b0b0d;
+      color: #ff9700;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 2px 18px;
+      border-radius: 12px;
+      display: inline-block;
+      margin: 3px 0;
+    }
+
+    .badge-title {
+      font-size: 9.5px;
+      color: #111;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge-qr-box {
+      background: #fff;
+      border-radius: 6px;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2px 0;
+    }
+
+    .badge-qr-box canvas, .badge-qr-box svg {
+      width: 125px;
+      height: 125px;
+    }
+
+    .badge-url-pill {
+      background: #f4f4f7;
+      border: 1px solid #d0d0d5;
+      border-radius: 10px;
+      padding: 2px 10px;
+      font-size: 7px;
+      color: #555;
+      margin-bottom: 2px;
+    }
+
+    .editor-fields {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .field-group label {
+      font-size: 0.8rem;
+      color: #a0a0b0;
+      font-weight: 600;
+    }
+
+    .field-group input {
+      background: #0b0b0d;
+      border: 1px solid #333;
+      color: #fff;
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .card-actions a, .card-actions button {
+      flex: 1;
+      text-align: center;
+      justify-content: center;
+    }
+
+    /* Print styling strictly formatted to Letter size sheet (215.9mm x 279.4mm) */
+    @media print {
+      @page {
+        size: letter portrait;
+        margin: 0;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-container {
+        display: block !important;
+      }
+      .print-page {
+        width: 215.9mm;
+        height: 279.4mm;
+        page-break-after: always;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-sizing: border-box;
+      }
+      .print-badge {
+        width: 150mm !important;
+        height: 150mm !important;
+        border-radius: 50% !important;
+        border: 1px dashed #666 !important;
+        box-shadow: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 10mm !important;
+        box-sizing: border-box !important;
+        background: #fff !important;
+        position: relative !important;
+      }
+      .print-badge::before {
+        content: '';
+        position: absolute;
+        top: 3mm; left: 3mm; right: 3mm; bottom: 3mm;
+        border: 2px solid #ff9700;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .print-badge .badge-sub { font-size: 9pt !important; color: #666 !important; margin-top: 4mm; }
+      .print-badge .badge-num-pill { font-size: 18pt !important; padding: 4px 28px !important; background: #0b0b0d !important; color: #ff9700 !important; margin: 3mm 0; }
+      .print-badge .badge-title { font-size: 13pt !important; color: #111 !important; margin-bottom: 2mm; }
+      .print-badge .badge-qr-box canvas, .print-badge .badge-qr-box svg { width: 75mm !important; height: 75mm !important; }
+      .print-badge .badge-url-pill { font-size: 8.5pt !important; padding: 2px 14px !important; margin-bottom: 4mm; }
+
+      .cut-guide-text {
+        position: absolute;
+        top: 22mm;
+        font-size: 10pt;
+        font-weight: bold;
+        color: #333;
+      }
+      .scale-ruler {
+        position: absolute;
+        bottom: 22mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .scale-line {
+        width: 50mm;
+        height: 1px;
+        background: #000;
+        position: relative;
+      }
+      .scale-line::before, .scale-line::after {
+        content: '';
+        position: absolute;
+        width: 1px;
+        height: 8px;
+        background: #000;
+        top: -4px;
+      }
+      .scale-line::before { left: 0; }
+      .scale-line::after { right: 0; }
+      .scale-text {
+        font-size: 8pt;
+        font-weight: bold;
+        margin-top: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container no-print">
+    <div class="header-actions">
+      <div>
+        <h1>Códigos QR Circulares (15 cm) <span>Impresión Hoja Carta</span></h1>
+        <p style="color: #a0a0b0; margin-top: 0.5rem;">6 códigos QR con márgenes de seguridad para que ningún texto se corte al recortar la circunferencia.</p>
+      </div>
+      <div class="btn-group">
+        <a href="qr/qr_codes_15cm_carta.pdf" download class="btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar PDF Actualizado (6 Páginas)
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Imprimir directamente
+        </button>
+        <a href="index.html" class="btn btn-secondary">← Volver al Control</a>
+      </div>
+    </div>
+
+    <div class="info-banner">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div>
+        <strong style="color: var(--accent); display: block; margin-bottom: 0.25rem;">Márgenes de Seguridad Corregidos:</strong>
+        Todo el texto y elementos están ahora agrupados dentro del círculo de seguridad interno. Al recortar la hoja por la línea punteada de 15.0 cm, ningún texto ni borde quedará cortado.
+      </div>
+    </div>
+
+    <div class="grid-qrs" id="qr-grid"></div>
+  </div>
+
+  <div class="print-container" style="display: none;" id="print-container"></div>
+
+  <script>
+    const sectionsData = [
+      { num: 1, name: "SALIDA / START LINE", url: "https://skyrace.app/sec/1" },
+      { num: 2, name: "CURVA NORTE", url: "https://skyrace.app/sec/2" },
+      { num: 3, name: "RECTA PRINCIPAL", url: "https://skyrace.app/sec/3" },
+      { num: 4, name: "CHICANE OESTE", url: "https://skyrace.app/sec/4" },
+      { num: 5, name: "META / FINISH LINE", url: "https://skyrace.app/sec/5" },
+      { num: 6, name: "ZONA PITS / BONUS", url: "https://skyrace.app/sec/6" }
+    ];
+
+    function generateQRCodes() {
+      const grid = document.getElementById('qr-grid');
+      const printContainer = document.getElementById('print-container');
+      grid.innerHTML = '';
+      printContainer.innerHTML = '';
+
+      sectionsData.forEach((sec, idx) => {
+        const card = document.createElement('div');
+        card.className = 'qr-card-edit';
+
+        const qrcodeId = `canvas-qr-${idx}`;
+        const printQrId = `print-qr-${idx}`;
+
+        card.innerHTML = `
+          <div class="badge-wrapper" id="wrapper-${idx}">
+            <div class="badge-header">
+              <div class="badge-sub">SKYRACE · RACE CONTROL</div>
+              <div class="badge-num-pill">SECCIÓN 0${sec.num}</div>
+              <div class="badge-title" id="disp-title-${idx}">${sec.name}</div>
+            </div>
+            <div class="badge-qr-box" id="${qrcodeId}"></div>
+            <div class="badge-url-pill" id="disp-url-${idx}">${sec.url}</div>
+          </div>
+
+          <div class="editor-fields">
+            <div class="field-group">
+              <label>Nombre de la Sección</label>
+              <input type="text" value="${sec.name}" oninput="updateSec(${idx}, 'name', this.value)" />
+            </div>
+            <div class="field-group">
+              <label>URL / Contenido del QR</label>
+              <input type="text" value="${sec.url}" oninput="updateSec(${idx}, 'url', this.value)" />
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <a href="qr/qr_sec_${sec.num}.png" download="qr_seccion_${sec.num}.png" class="btn btn-secondary">PNG High-Res</a>
+            <a href="qr/qr_sec_${sec.num}.svg" download="qr_seccion_${sec.num}.svg" class="btn btn-secondary">SVG Vector</a>
+          </div>
+        `;
+
+        grid.appendChild(card);
+
+        const page = document.createElement('div');
+        page.className = 'print-page';
+        page.innerHTML = `
+          <div class="cut-guide-text">✂ LÍNEA DE CORTE - DIÁMETRO EXACTO: 15.0 CM (150 MM)</div>
+          <div class="print-badge">
+            <div class="badge-header">
+              <div class="badge-sub">SKYRACE · RACE CONTROL</div>
+              <div class="badge-num-pill">SECCIÓN 0${sec.num}</div>
+              <div class="badge-title" id="print-disp-title-${idx}">${sec.name}</div>
+            </div>
+            <div class="badge-qr-box" id="${printQrId}"></div>
+            <div class="badge-url-pill" id="print-disp-url-${idx}">${sec.url}</div>
+          </div>
+          <div class="scale-ruler">
+            <div class="scale-line"></div>
+            <div class="scale-text">VERIFICACIÓN DE ESCALA: 5.0 CM EXACTOS</div>
+          </div>
+        `;
+        printContainer.appendChild(page);
+
+        renderQR(qrcodeId, sec.url, 125);
+        renderQR(printQrId, sec.url, 250);
+      });
+    }
+
+    function renderQR(containerId, text, size) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      try {
+        const typeNumber = 0;
+        const errorCorrectionLevel = 'H';
+        const qr = qrcode(typeNumber, errorCorrectionLevel);
+        qr.addData(text);
+        qr.make();
+        container.innerHTML = qr.createSvgTag(size / 33, 0);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateSec(idx, field, val) {
+      sectionsData[idx][field] = val;
+      if (field === 'name') {
+        document.getElementById(`disp-title-${idx}`).innerText = val;
+        document.getElementById(`print-disp-title-${idx}`).innerText = val;
+      } else if (field === 'url') {
+        document.getElementById(`disp-url-${idx}`).innerText = val;
+        document.getElementById(`print-disp-url-${idx}`).innerText = val;
+        renderQR(`canvas-qr-${idx}`, val, 125);
+        renderQR(`print-qr-${idx}`, val, 250);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', generateQRCodes);
+  </script>
+</body>
+</html>

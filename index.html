@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0b0d" />
+    <meta
+      name="description"
+      content="Sistema de cronometraje y clasificación en vivo para carreras contrarreloj de drones."
+    />
+    <title>SkyRace · Cronometraje en vivo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230b0b0d%22/><path d=%22M12 29l38 45 38-45-38 21z%22 fill=%22%23ff9700%22/><path d=%22M38 54l12 15 12-15-12 4z%22 fill=%22white%22/></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="SkyDrone Race Control">
+        <span class="brand-crop">
+          <img src="assets/skydrone-logo.png" alt="SkyDrone" />
+        </span>
+        <span class="brand-divider"></span>
+        <span class="brand-product">RACE CONTROL</span>
+      </a>
+
+      <nav class="view-switcher" aria-label="Cambiar vista">
+        <button class="view-tab is-active" type="button" data-view="control" aria-pressed="true">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/></svg>
+          Control de carrera
+        </button>
+        <button class="view-tab" type="button" data-view="public" aria-pressed="false">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3h18v14H3zM8 21h8m-4-4v4"/></svg>
+          Pantalla pública
+        </button>
+        <a class="view-tab" href="qr-generator.html" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 6px;">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h3v3h-3zM18 18h3v3h-3z"/></svg>
+          QRs Circulares (15cm)
+        </a>
+      </nav>
+
+      <div class="live-pill"><span></span> <b id="sync-status">Modo local</b></div>
+    </header>
+
+    <main>
+      <section class="control-view view-panel is-active" id="control-view">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">CAMPEONATO SKYDRONE 2026</p>
+            <h1>Control de carrera</h1>
+            <p class="subtitle">Cronometraje oficial · Circuito de 5 secciones</p>
+          </div>
+          <div class="race-meta">
+            <span class="race-number">RACE <strong>01</strong></span>
+            <span class="meta-separator"></span>
+            <span><small>Estado</small><strong class="status-open">Pista abierta</strong></span>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel timer-panel" aria-labelledby="timer-title">
+            <div class="panel-head">
+              <div>
+                <span class="step-label">PILOTO EN PISTA</span>
+                <h2 id="timer-title">Cronometraje</h2>
+              </div>
+              <button class="icon-button" id="add-pilot-button" type="button" aria-label="Agregar piloto" title="Agregar piloto">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </div>
+
+            <label class="field-label" for="pilot-select">Seleccionar piloto</label>
+            <div class="pilot-select-wrap">
+              <span class="pilot-avatar" id="selected-avatar">MS</span>
+              <select id="pilot-select" aria-label="Piloto en pista"></select>
+              <svg class="chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 9 5 5 5-5"/></svg>
+            </div>
+
+            <div class="timer-stage" aria-live="polite">
+              <div class="timer-status-row">
+                <span class="timer-status" id="timer-status"><i></i> LISTO PARA INICIAR</span>
+                <span class="current-section" id="current-section">SECCIÓN 1 / 5</span>
+              </div>
+              <div class="stopwatch" id="stopwatch">00:00<span>.00</span></div>
+              <p class="timer-hint" id="timer-hint">El cronómetro comenzará con la primera pulsación</p>
+
+              <div class="track-progress" id="track-progress" aria-label="Progreso en el circuito"></div>
+            </div>
+
+            <button class="race-action" id="race-action" type="button">
+              <span class="action-icon">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 7 8 5-8 5z"/></svg>
+              </span>
+              <span class="action-copy">
+                <strong id="action-title">INICIAR CONTRARRELOJ</strong>
+                <small id="action-subtitle">Pulsa para comenzar</small>
+              </span>
+              <kbd>ESPACIO</kbd>
+            </button>
+
+            <div class="timer-footer">
+              <span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 8v4l3 2M12 3a9 9 0 1 0 9 9"/></svg> Precisión: 1/100 s</span>
+              <button id="cancel-run" type="button" disabled>Cancelar intento</button>
+            </div>
+          </section>
+
+          <section class="panel leaderboard-panel" aria-labelledby="leaderboard-title">
+            <div class="panel-head leaderboard-head">
+              <div>
+                <span class="step-label">ACTUALIZACIÓN INSTANTÁNEA</span>
+                <h2 id="leaderboard-title">Leaderboard en vivo</h2>
+              </div>
+              <button class="ghost-button" id="export-button" type="button">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg>
+                Exportar
+              </button>
+            </div>
+
+            <div class="podium" id="podium"></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>POS</th>
+                    <th>PILOTO</th>
+                    <th>S1</th>
+                    <th>S2</th>
+                    <th>S3</th>
+                    <th>S4</th>
+                    <th>S5</th>
+                    <th>TIEMPO</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+              </table>
+            </div>
+            <div class="leaderboard-foot">
+              <span id="last-updated">Actualizado ahora</span>
+              <button type="button" id="open-public-view">Abrir vista de pantalla <span>↗</span></button>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel recent-panel" aria-labelledby="recent-title">
+          <div class="panel-head compact">
+            <div>
+              <span class="step-label">REGISTRO OFICIAL</span>
+              <h2 id="recent-title">Últimos intentos</h2>
+            </div>
+            <div class="recent-tools">
+              <span class="run-count" id="run-count">0 intentos</span>
+              <button class="clear-results" id="clear-results" type="button">Borrar resultados</button>
+            </div>
+          </div>
+          <div class="recent-list" id="recent-list"></div>
+        </section>
+      </section>
+
+      <section class="public-view view-panel" id="public-view">
+        <div class="public-heading">
+          <div>
+            <p class="eyebrow">SKYDRONE CHAMPIONSHIP · RACE 01</p>
+            <h1>Clasificación <span>en vivo</span></h1>
+          </div>
+          <div class="public-clock" id="public-clock">--:--:--</div>
+        </div>
+        <div class="public-podium" id="public-podium"></div>
+        <div class="public-table-wrap">
+          <table class="public-table">
+            <thead>
+              <tr>
+                <th>POSICIÓN</th><th>PILOTO / DRONE</th><th>SECCIÓN 1</th><th>SECCIÓN 2</th><th>SECCIÓN 3</th><th>SECCIÓN 4</th><th>SECCIÓN 5</th><th>TIEMPO TOTAL</th>
+              </tr>
+            </thead>
+            <tbody id="public-leaderboard-body"></tbody>
+          </table>
+        </div>
+        <footer class="public-footer">
+          <span><i></i> RESULTADOS EN TIEMPO REAL</span>
+          <span>5 SECCIONES · MENOR TIEMPO GANA</span>
+          <span id="public-runners">0 PILOTOS CLASIFICADOS</span>
+        </footer>
+      </section>
+    </main>
+
+    <dialog id="pilot-dialog">
+      <form method="dialog" id="pilot-form">
+        <div class="dialog-head">
+          <div>
+            <span class="step-label">NUEVO COMPETIDOR</span>
+            <h2>Agregar piloto</h2>
+          </div>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Cerrar">×</button>
+        </div>
+        <label>Nombre del piloto<input id="pilot-name" name="name" placeholder="Ej. Valentina Soto" required maxlength="40" /></label>
+        <label>Nombre o número del drone<input id="drone-name" name="drone" placeholder="Ej. VX-09" required maxlength="20" /></label>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-close-dialog>Cancelar</button>
+          <button class="primary-button" type="submit">Agregar a la parrilla</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
