@@ -3,6 +3,7 @@ import {
   loadRemoteData,
   saveRemotePilot,
   saveRemoteRun,
+  deleteRemotePilot,
   clearRemoteRuns,
   subscribeToRemoteChanges
 } from "./data-service.js";
@@ -65,6 +66,7 @@ import {
     publicRunners: document.getElementById("public-runners"),
     publicClock: document.getElementById("public-clock"),
     addPilotButton: document.getElementById("add-pilot-button"),
+    deletePilotButton: document.getElementById("delete-pilot-button"),
     pilotDialog: document.getElementById("pilot-dialog"),
     pilotForm: document.getElementById("pilot-form"),
     pilotName: document.getElementById("pilot-name"),
@@ -185,6 +187,7 @@ import {
     const selected = getPilot(selectedPilotId);
     elements.selectedAvatar.textContent = initials(selected.name);
     elements.pilotSelect.disabled = timerState === "running";
+    elements.deletePilotButton.disabled = timerState === "running" || data.pilots.length < 2;
   }
 
   function renderTrack() {
@@ -375,6 +378,28 @@ import {
     showToast(`${name} fue agregado a la parrilla`);
   }
 
+  function deleteSelectedPilot() {
+    if (timerState === "running") return;
+    const pilot = getPilot(selectedPilotId);
+    if (data.pilots.length < 2) {
+      showToast("Debe quedar al menos un piloto en la parrilla");
+      return;
+    }
+    const relatedRuns = data.runs.filter((run) => run.pilotId === pilot.id).length;
+    const detail = relatedRuns
+      ? ` También se eliminarán sus ${relatedRuns} intento${relatedRuns === 1 ? "" : "s"}.`
+      : "";
+    if (!window.confirm(`¿Eliminar a ${pilot.name} (${pilot.drone})?${detail} Esta acción no se puede deshacer.`)) return;
+
+    data.pilots = data.pilots.filter((entry) => entry.id !== pilot.id);
+    data.runs = data.runs.filter((run) => run.pilotId !== pilot.id);
+    selectedPilotId = data.pilots[0].id;
+    persist("Piloto eliminado");
+    if (isSupabaseConfigured) deleteRemotePilot(pilot.id).catch(reportRemoteError);
+    renderAll();
+    showToast(`${pilot.name} fue eliminado de la parrilla`);
+  }
+
   function exportCsv() {
     const ranked = bestRuns();
     if (!ranked.length) {
@@ -420,6 +445,7 @@ import {
     elements.pilotDialog.showModal();
     window.setTimeout(() => elements.pilotName.focus(), 50);
   });
+  elements.deletePilotButton.addEventListener("click", deleteSelectedPilot);
   document.querySelectorAll("[data-close-dialog]").forEach((button) => button.addEventListener("click", () => elements.pilotDialog.close()));
   elements.pilotForm.addEventListener("submit", addPilot);
   elements.exportButton.addEventListener("click", exportCsv);

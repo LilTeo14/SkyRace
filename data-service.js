@@ -67,6 +67,14 @@ export async function saveRemoteRun(run) {
   );
 }
 
+export async function deleteRemotePilot(pilotId) {
+  if (!supabase) return;
+  ensureSuccess(
+    await supabase.from("pilots").delete().eq("id", pilotId),
+    "No se pudo eliminar el piloto"
+  );
+}
+
 export async function clearRemoteRuns() {
   if (!supabase) return;
   ensureSuccess(

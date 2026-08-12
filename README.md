@@ -51,6 +51,7 @@ El esquema incluido permite escritura anónima para que el prototipo funcione si
 - Tiempos individuales para las cinco secciones.
 - Vista pública para proyección.
 - Registro de pilotos e historial de intentos.
+- Eliminación de pilotos, junto con sus intentos asociados.
 - Exportación CSV.
 - Funcionamiento local sin backend y conexión opcional con Supabase.
 

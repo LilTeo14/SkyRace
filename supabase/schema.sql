@@ -34,6 +34,11 @@ create policy "Registro público de pilotos"
   to anon, authenticated
   with check (true);
 
+create policy "Eliminación pública de pilotos"
+  on public.pilots for delete
+  to anon, authenticated
+  using (true);
+
 create policy "Lectura pública de tiempos"
   on public.runs for select
   to anon, authenticated

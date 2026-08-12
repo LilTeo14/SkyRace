@@ -178,6 +178,10 @@ h1 { font-size: clamp(32px, 4vw, 48px); line-height: 1; letter-spacing: -.04em; 
 }
 .icon-button:hover, .dialog-close:hover { border-color: #45454c; background: #1d1d22; }
 .icon-button svg { width: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.pilot-actions { display: flex; gap: 8px; }
+.danger-icon-button { color: #8a8a91; }
+.danger-icon-button:hover:not(:disabled) { border-color: rgba(255, 93, 93, .55); color: var(--danger); background: rgba(255, 93, 93, .08); }
+.danger-icon-button:disabled { cursor: default; opacity: .28; }
 
 .field-label { color: #77777d; text-transform: uppercase; letter-spacing: .12em; font-size: 8px; font-weight: 700; display: block; margin: 27px 0 8px; }
 .pilot-select-wrap { position: relative; height: 58px; border: 1px solid #303036; border-radius: 10px; background: #101013; display: flex; align-items: center; }
